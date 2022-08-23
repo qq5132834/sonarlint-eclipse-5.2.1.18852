@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+   <extension point="org.eclipse.core.contenttype.contentTypes"> 
+      <content-type id="cobol" name="Cobol Source File"
+       base-type="org.eclipse.jdt.core.javaSource"      
+       file-extensions="cbl">
+      </content-type> 
+   </extension>
+   <extension
+         point="org.sonarlint.eclipse.core.projectAdapterParticipant">
+      <participant
+            class="org.sonarlint.eclipse.core.internal.adapter.DefaultSonarLintAdapterFactoryTest$CobolSLProjectParticipant">
+      </participant>
+   </extension>
+   <extension
+         point="org.sonarlint.eclipse.core.fileAdapterParticipant">
+      <participant
+            class="org.sonarlint.eclipse.core.internal.adapter.DefaultSonarLintAdapterFactoryTest$CobolSLFileAdapterParticipant">
+      </participant>
+   </extension> 
+</plugin>

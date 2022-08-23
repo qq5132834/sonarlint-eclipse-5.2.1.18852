@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+   <extension-point id="projectConfigurators" name="Project Configurators" schema="schema/projectConfigurators.exsd"/>
+   <extension-point id="projectsProvider" name="SonarLint Projects Provider" schema="schema/projectsProvider.exsd"/>
+   <extension-point id="fileAdapterParticipant" name="SonarLint File Adapter Participant" schema="schema/fileAdapterParticipant.exsd"/>
+   <extension-point id="projectAdapterParticipant" name="SonarLint Project Adapter Participant" schema="schema/projectAdapterParticipant.exsd"/>
+   <extension-point id="analysisConfigurator" name="SonarLint Analysis Configurator" schema="schema/analysisConfigurator.exsd"/>
+   <extension-point id="languageProvider" name="SonarLint File Language Provider" schema="schema/languageProvider.exsd"/>
+   <extension-point id="typeProvider" name="SonarLint File Type Provider" schema="schema/typeProvider.exsd"/>
+
+
+   <extension
+        id="sonarlintOnTheFlyProblem"
+        name="SonarLint On-The-Fly Issue"
+        point="org.eclipse.core.resources.markers">
+      <super
+            type="org.eclipse.core.resources.problemmarker">
+      </super>
+      <persistent
+            value="false">
+      </persistent>
+      <attribute
+            name="rulename">
+      </attribute>
+      <attribute
+            name="rulekey">
+      </attribute>
+      <attribute
+            name="creationdate">
+      </attribute>
+   </extension>
+   
+   <extension
+        id="sonarlintReportProblem"
+        name="SonarLint Report Issue"
+        point="org.eclipse.core.resources.markers">
+      <super
+            type="org.eclipse.core.resources.problemmarker">
+      </super>
+      <persistent
+            value="false">
+      </persistent>
+      <attribute
+            name="rulename">
+      </attribute>
+      <attribute
+            name="rulekey">
+      </attribute>
+      <attribute
+            name="creationdate">
+      </attribute>
+   </extension>
+
+  <extension
+        point="org.eclipse.core.expressions.propertyTesters">
+     <propertyTester
+           class="org.sonarlint.eclipse.core.internal.resources.SonarLintPropertyTester"
+           id="org.sonarlint.eclipse.core.internal.resources.SonarLintProjectTester"
+           namespace="org.sonarlint.eclipse.core"
+           properties="bound,autoAnalysisEnabled,open,excluded,supportsFullAnalysis"
+           type="org.sonarlint.eclipse.core.resource.ISonarLintProject">
+     </propertyTester>
+     <propertyTester
+           class="org.sonarlint.eclipse.core.internal.resources.SonarLintPropertyTester"
+           id="org.sonarlint.eclipse.core.internal.resources.SonarLintFileTester"
+           namespace="org.sonarlint.eclipse.core"
+           properties="bound,autoAnalysisEnabled,open,excluded"
+           type="org.sonarlint.eclipse.core.resource.ISonarLintFile">
+     </propertyTester>
+     <propertyTester
+           class="org.sonarlint.eclipse.core.internal.resources.MarkerPropertyTester"
+           id="org.sonarlint.eclipse.core.internal.resources.MarkerPropertyTester"
+           namespace="org.sonarlint.eclipse.core"
+           properties="standalone"
+           type="org.eclipse.core.resources.IMarker">
+     </propertyTester>
+  </extension>
+  <extension
+        point="org.eclipse.core.runtime.adapters">
+     <factory
+           adaptableType="org.eclipse.core.runtime.IAdaptable"
+           class="org.sonarlint.eclipse.core.internal.adapter.DefaultSonarLintAdapterFactory">
+        <adapter
+              type="org.sonarlint.eclipse.core.resource.ISonarLintProject">
+        </adapter>
+        <adapter
+      		  type="org.sonarlint.eclipse.core.resource.ISonarLintFile">
+        </adapter>
+        <adapter
+              type="org.sonarlint.eclipse.core.resource.ISonarLintIssuable">
+        </adapter>
+     </factory>
+  </extension>
+  <extension
+        point="org.sonarlint.eclipse.core.projectsProvider">
+     <provider
+           class="org.sonarlint.eclipse.core.internal.resources.DefaultSonarLintProjectsProvider">
+     </provider>
+  </extension>
+</plugin>

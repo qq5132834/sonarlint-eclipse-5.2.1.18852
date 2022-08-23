@@ -1,0 +1,942 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+
+<!-- Extensions -->
+
+  <extension point="org.eclipse.ui.preferencePages">
+    <page
+        class="org.sonarlint.eclipse.ui.internal.preferences.SonarLintPreferencePage"
+        id="org.sonarlint.eclipse.ui.preferences.SonarLintPreferencePage"
+        name="%sonar.preference.page.name">
+        <keywordReference id="org.sonarlint.eclipse.ui.SonarLintKeyword"/>
+    </page>
+    <page
+          category="org.sonarlint.eclipse.ui.preferences.SonarLintPreferencePage"
+          class="org.sonarlint.eclipse.ui.internal.properties.SonarLintExtraArgumentsPreferenceAndPropertyPage"
+          id="org.sonarlint.eclipse.ui.properties.SonarExtraArgumentsPreferenceAndPropertyPage"
+          name="%sonar.preference.extraProps.page.name">
+          <keywordReference id="org.sonarlint.eclipse.ui.SonarLintKeyword"/>
+    </page>
+    <page
+          category="org.sonarlint.eclipse.ui.preferences.SonarLintPreferencePage"
+          class="org.sonarlint.eclipse.ui.internal.properties.FileExclusionsPage"
+          id="org.sonarlint.eclipse.ui.properties.FileExclusionsPage"
+          name="File Exclusions">
+          <keywordReference id="org.sonarlint.eclipse.ui.SonarLintKeyword"/>
+    </page>
+    <page
+          category="org.sonarlint.eclipse.ui.preferences.SonarLintPreferencePage"
+          class="org.sonarlint.eclipse.ui.internal.properties.RulesConfigurationPage"
+          id="org.sonarlint.eclipse.ui.properties.RulesConfigurationPage"
+          name="Rules Configuration">
+          <keywordReference id="org.sonarlint.eclipse.ui.SonarLintKeyword"/>
+    </page>
+    <page
+          category="org.sonarlint.eclipse.ui.preferences.SonarLintPreferencePage"
+          class="org.sonarlint.eclipse.ui.internal.properties.AboutPropertyPage"
+          id="org.sonarlint.eclipse.ui.properties.AboutPropertyPage"
+          name="Miscellaneous">
+          <keywordReference id="org.sonarlint.eclipse.ui.SonarLintKeyword"/>
+    </page>
+  </extension>
+
+  <extension
+     point="org.eclipse.ui.keywords">
+    <keyword
+            label="sonar sonarqube sonarlint"
+            id="org.sonarlint.eclipse.ui.SonarLintKeyword"/>
+   </extension>
+   
+    
+	<extension point="org.eclipse.ui.newWizards">
+	  <category
+	    id="org.sonarlint.eclipse"
+	    name="%sonar.category.view.name"/>
+	
+	  <wizard
+	      id="org.sonarlint.eclipse.ui.new.server"
+	      name="New SonarQube/SonarCloud Connection"
+	      class="org.sonarlint.eclipse.ui.internal.binding.wizard.connection.ServerConnectionWizard"
+	      category="org.sonarlint.eclipse"
+	      icon="icons/full/eview16/bindings.png">
+	    <description>Configure a connection with a SonarQube or SonarCloud server</description>
+	  </wizard>
+	</extension>
+	
+	<extension
+      point="org.eclipse.ui.decorators">
+   <decorator
+         class="org.sonarlint.eclipse.ui.internal.binding.BindingsViewDecorator"
+         icon="icons/full/eview16/bindings.png"
+         id="org.sonarlint.eclipse.ui.navigatorDecorator"
+         label="SonarLint Server State Decorator"
+         lightweight="true"
+         location="BOTTOM_RIGHT"
+         state="true">
+      <enablement>
+          <or>
+            <objectClass
+                  name="org.sonarlint.eclipse.core.internal.engine.connected.IConnectedEngineFacade">
+            </objectClass>
+            <objectClass
+                  name="org.sonarlint.eclipse.core.internal.engine.connected.RemoteSonarProject">
+            </objectClass>
+            <objectClass
+                  name="org.sonarlint.eclipse.core.resource.ISonarLintProject">
+            </objectClass>
+          </or>
+      </enablement>
+   </decorator>
+</extension>
+
+  <extension point="org.eclipse.ui.views">
+    <category
+        name="%sonar.category.view.name"
+        id="org.sonarlint.eclipse">
+    </category>
+    <view
+        allowMultiple="false"
+        category="org.sonarlint.eclipse"
+        class="org.sonarlint.eclipse.ui.internal.views.issues.OnTheFlyIssuesView"
+        icon="icons/full/eview16/onthefly.png"
+        id="org.sonarlint.eclipse.ui.views.issues.IssuesView"
+        name="%sonar.issues.view.name">
+    </view>
+    <view
+        allowMultiple="false"
+        category="org.sonarlint.eclipse"
+        class="org.sonarlint.eclipse.ui.internal.views.issues.SonarLintReportView"
+        icon="icons/full/eview16/report.png"
+        id="org.sonarlint.eclipse.ui.views.issues.ChangeSetIssuesView"
+        name="%sonar.changesetissues.view.name">
+    </view>
+    <view
+	        allowMultiple="false"
+          category="org.sonarlint.eclipse"
+          class="org.sonarlint.eclipse.ui.internal.views.RuleDescriptionWebView"
+          icon="icons/full/eview16/rule.png"
+          id="org.sonarlint.eclipse.ui.views.RuleDescriptionWebView"
+          name="SonarLint Rule Description">
+    </view>
+    <view
+	        allowMultiple="false"
+          category="org.sonarlint.eclipse"
+          class="org.sonarlint.eclipse.ui.internal.views.locations.IssueLocationsView"
+          icon="icons/full/eview16/locations.png"
+          id="org.sonarlint.eclipse.ui.views.IssueLocationsView"
+          name="SonarLint Issue Locations">
+    </view>
+    <view
+	        allowMultiple="false"
+	        category="org.sonarlint.eclipse"
+	        class="org.sonarlint.eclipse.ui.internal.binding.BindingsView"
+	        icon="icons/full/eview16/bindings.png"
+	        id="org.sonarlint.eclipse.ui.ServersView"
+	        name="SonarLint Bindings">
+	  </view>
+  </extension>
+  
+  <extension point="org.eclipse.ui.contexts">
+	  <context
+	    id="org.eclipse.ui.sonarlintServerViewScope"
+	    name="In SonarLint Servers View"
+	    description="In SonarLint Servers View"
+	    parentId="org.eclipse.ui.contexts.window">
+	  </context>
+	</extension>
+	
+	<extension
+      point="org.eclipse.ui.navigator.navigatorContent">
+	   <navigatorContent
+	         activeByDefault="true"
+	         contentProvider="org.sonarlint.eclipse.ui.internal.binding.BindingsViewContentProvider"
+	         icon="icons/full/eview16/bindings.png"
+	         id="org.sonarlint.eclipse.ui.ServersView.content.root"
+	         labelProvider="org.sonarlint.eclipse.ui.internal.binding.BindingsViewLabelProvider"
+	         name="Server Provider"
+	         priority="highest">
+	      <triggerPoints>
+	         <or>
+	            <instanceof
+	                  value="org.sonarlint.eclipse.core.internal.engine.connected.IConnectedEngineFacade">
+	            </instanceof>
+	            <instanceof
+	                  value="org.sonarlint.eclipse.core.resource.ISonarLintProject">
+	            </instanceof>
+	         </or>
+	      </triggerPoints>
+	      <possibleChildren>
+	         <or>
+	            <instanceof
+	                  value="java.lang.Object">
+	            </instanceof>
+	            <instanceof
+	                  value="org.sonarlint.eclipse.core.resource.ISonarLintProject">
+	            </instanceof>
+	         </or>
+	      </possibleChildren>
+			  <actionProvider
+			            class="org.sonarlint.eclipse.ui.internal.binding.BindingsViewActionProvider"
+			            id="org.sonarlint.eclipse.ui.ServersView.ServerActionProvider"
+			            priority="highest">
+					<enablement>
+		             <or>
+		                <instanceof
+		                      value="org.sonarlint.eclipse.core.internal.engine.connected.IConnectedEngineFacade">
+		                </instanceof>
+		                <instanceof
+		                      value="org.sonarlint.eclipse.core.resource.ISonarLintProject">
+		                </instanceof>
+		                <instanceof
+		                      value="org.eclipse.core.resources.IWorkspaceRoot">
+		                </instanceof>
+		               <adapt
+		                     type="java.util.Collection">
+		                  <count
+		                        value="0">
+		                  </count>
+		               </adapt>
+		             </or>
+		            </enablement>
+			  </actionProvider>      
+	   </navigatorContent>
+	</extension>
+	
+	<extension
+	      point="org.eclipse.ui.navigator.viewer">
+	   <viewerContentBinding
+	         viewerId="org.sonarlint.eclipse.ui.ServersView">
+	      <includes>
+	         <contentExtension
+	               isRoot="true"
+	               pattern="org.sonarlint.eclipse.ui.ServersView.content.root">
+	         </contentExtension>
+	      </includes>
+	   </viewerContentBinding>
+		<viewer
+	       viewerId="org.sonarlint.eclipse.ui.ServersView">
+			<options>
+				<property name="org.eclipse.ui.navigator.hideLinkWithEditorAction"
+					value="true">
+				</property>
+			</options>
+		</viewer>
+	</extension>
+
+  <extension
+      point="org.eclipse.ui.ide.markerSupport">
+    <markerContentGenerator
+         id="org.sonarlint.eclipse.ui.views.issues.onTheFlyIssueMarkerGenerator"
+         name="SonarLint On-The-Fly Marker Generator">
+        <markerTypeReference
+              id="org.sonarlint.eclipse.core.sonarlintOnTheFlyProblem"/>
+        <markerFieldReference
+              id="org.sonarlint.eclipse.ui.views.issues.issueCreationDateField"
+              visible="true"/>
+        <markerFieldReference
+              id="org.sonarlint.eclipse.ui.views.issues.issueDescriptionField"
+              visible="true"/>
+        <markerFieldReference
+              id="org.sonarlint.eclipse.ui.views.issues.issueRuleKeyField"
+              visible="false"/>
+        <markerFieldReference
+              id="org.sonarlint.eclipse.ui.views.issues.issueRuleNameField"
+              visible="false"/>
+        <markerFieldReference
+              id="org.sonarlint.eclipse.ui.views.issues.serverIssueKeyField"
+              visible="false"/>
+        <markerFieldReference
+              id="org.eclipse.ui.ide.resourceField"
+              visible="true"/>
+        <markerFieldReference
+              id="org.eclipse.ui.ide.pathField"
+              visible="false"/>
+        <!-- Default Filtering -->
+        <markerFieldConfiguration
+              enabled="true"
+              id="org.sonarlint.eclipse.ui.issues.allIssuesOnSelectionFiltering"
+              name="All Issues on Selection"
+              scope="ON_SELECTED_AND_CHILDREN">
+        </markerFieldConfiguration>
+
+      <markerGrouping
+            id="org.sonarlint.eclipse.ui.issues.severityGrouping"
+            label="Severity">
+         <markerGroupingEntry
+               id="org.sonarlint.eclipse.ui.issues.severityGrouping.blocker"
+               label="Blocker"
+               markerGrouping="org.sonarlint.eclipse.ui.issues.severityGrouping"
+               priority="5">
+         </markerGroupingEntry>
+         <markerGroupingEntry
+               id="org.sonarlint.eclipse.ui.issues.severityGrouping.critical"
+               label="Critical"
+               markerGrouping="org.sonarlint.eclipse.ui.issues.severityGrouping"
+               priority="4">
+         </markerGroupingEntry>
+         <markerGroupingEntry
+               id="org.sonarlint.eclipse.ui.issues.severityGrouping.major"
+               label="Major"
+               markerGrouping="org.sonarlint.eclipse.ui.issues.severityGrouping"
+               priority="3">
+         </markerGroupingEntry>
+         <markerGroupingEntry
+               id="org.sonarlint.eclipse.ui.issues.severityGrouping.minor"
+               label="Minor"
+               markerGrouping="org.sonarlint.eclipse.ui.issues.severityGrouping"
+               priority="2">
+         </markerGroupingEntry>
+         <markerGroupingEntry
+               id="org.sonarlint.eclipse.ui.issues.severityGrouping.info"
+               label="Info"
+               markerGrouping="org.sonarlint.eclipse.ui.issues.severityGrouping"
+               priority="1">
+         </markerGroupingEntry>
+         <markerAttributeGrouping
+               attribute="sonarseverity"
+               markerType="org.sonarlint.eclipse.core.sonarlintOnTheFlyProblem">
+            <markerAttributeMapping
+                  markerGroupingEntry="org.sonarlint.eclipse.ui.issues.severityGrouping.blocker"
+                  value="BLOCKER">
+            </markerAttributeMapping>
+            <markerAttributeMapping
+                  markerGroupingEntry="org.sonarlint.eclipse.ui.issues.severityGrouping.critical"
+                  value="CRITICAL">
+            </markerAttributeMapping>
+            <markerAttributeMapping
+                  markerGroupingEntry="org.sonarlint.eclipse.ui.issues.severityGrouping.major"
+                  value="MAJOR">
+            </markerAttributeMapping>
+            <markerAttributeMapping
+                  markerGroupingEntry="org.sonarlint.eclipse.ui.issues.severityGrouping.minor"
+                  value="MINOR">
+            </markerAttributeMapping>
+            <markerAttributeMapping
+                  markerGroupingEntry="org.sonarlint.eclipse.ui.issues.severityGrouping.info"
+                  value="INFO">
+            </markerAttributeMapping>
+         </markerAttributeGrouping>
+      </markerGrouping>
+    </markerContentGenerator>
+    <markerContentGenerator
+         id="org.sonarlint.eclipse.ui.views.issues.reportIssueMarkerGenerator"
+         name="SonarLint Report Issue Marker Generator">
+        <markerTypeReference
+              id="org.sonarlint.eclipse.core.sonarlintReportProblem"/>
+        <markerFieldReference
+              id="org.eclipse.ui.ide.resourceField"
+              visible="true"/>
+        <markerFieldReference
+              id="org.eclipse.ui.ide.pathField"
+              visible="false"/>
+        <markerFieldReference
+              id="org.sonarlint.eclipse.ui.views.issues.issueCreationDateField"
+              visible="true"/>
+        <markerFieldReference
+              id="org.sonarlint.eclipse.ui.views.issues.issueDescriptionField"
+              visible="true"/>
+        <markerFieldReference
+              id="org.sonarlint.eclipse.ui.views.issues.issueRuleKeyField"
+              visible="false"/>
+        <markerFieldReference
+              id="org.sonarlint.eclipse.ui.views.issues.issueRuleNameField"
+              visible="false"/>
+        <markerFieldReference
+              id="org.sonarlint.eclipse.ui.views.issues.serverIssueKeyField"
+              visible="false"/>
+        <!-- Default Filtering -->
+        <markerFieldConfiguration
+              enabled="true"
+              id="org.sonarlint.eclipse.ui.issues.allIssuesOnReport"
+              name="All Issues"
+              scope="ON_ANY">
+        </markerFieldConfiguration>
+    </markerContentGenerator>
+    <markerField
+        class="org.sonarlint.eclipse.ui.internal.views.issues.IssueDescriptionField"
+        filterClass="org.eclipse.ui.internal.views.markers.DescriptionFieldFilter"
+        filterConfigurationClass="org.eclipse.ui.internal.views.markers.DescriptionConfigurationArea"
+        id="org.sonarlint.eclipse.ui.views.issues.issueDescriptionField"
+        name="Description">
+    </markerField>
+    <markerField
+        class="org.sonarlint.eclipse.ui.internal.views.issues.IssueRuleNameField"
+        id="org.sonarlint.eclipse.ui.views.issues.issueRuleNameField"
+        name="Rule name">
+    </markerField>
+    <markerField
+        class="org.sonarlint.eclipse.ui.internal.views.issues.IssueRuleKeyField"
+        id="org.sonarlint.eclipse.ui.views.issues.issueRuleKeyField"
+        name="%sonar.issues.view.rulekeyfield">
+    </markerField>
+    <markerField
+        class="org.sonarlint.eclipse.ui.internal.views.issues.CreationDateField"
+        id="org.sonarlint.eclipse.ui.views.issues.issueCreationDateField"
+        name="Date">
+    </markerField>
+    <markerField
+        class="org.sonarlint.eclipse.ui.internal.views.issues.ServerIssueKeyField"
+        id="org.sonarlint.eclipse.ui.views.issues.serverIssueKeyField"
+        name="%sonar.issues.view.serverissuekeyfield">
+    </markerField>
+
+    <markerTypeCategory
+          name="SonarLint">
+       <markerTypeReference id="org.sonarlint.eclipse.core.sonarlintOnTheFlyProblem">
+       </markerTypeReference>
+    </markerTypeCategory>
+  </extension>
+
+  <extension
+      point="org.eclipse.ui.propertyPages">
+    <page
+      class="org.sonarlint.eclipse.ui.internal.properties.SonarLintProjectPropertyPage"
+       id="org.sonarlint.eclipse.ui.properties.sonarProjectPropertyPage"
+       name="%sonar.properties.page.name">
+       <enabledWhen>
+          <adapt type="org.sonarlint.eclipse.core.resource.ISonarLintProject">
+            <test property="org.sonarlint.eclipse.core.open"/>
+          </adapt>
+       </enabledWhen>
+    </page>
+    <page
+      class="org.sonarlint.eclipse.ui.internal.properties.SonarLintExtraArgumentsPreferenceAndPropertyPage"
+       id="org.sonarlint.eclipse.ui.properties.SonarExtraArgumentsPreferenceAndPropertyPage"
+       category="org.sonarlint.eclipse.ui.properties.sonarProjectPropertyPage"
+       name="%sonar.preference.extraProps.page.name">
+       <enabledWhen>
+          <adapt type="org.sonarlint.eclipse.core.resource.ISonarLintProject">
+            <test property="org.sonarlint.eclipse.core.open"/>
+          </adapt>
+       </enabledWhen>
+    </page>
+    
+    <page
+       category="org.sonarlint.eclipse.ui.properties.sonarProjectPropertyPage"
+       class="org.sonarlint.eclipse.ui.internal.properties.FileExclusionsPage"
+       id="org.sonarlint.eclipse.ui.properties.FileExclusionsPage"
+       name="File Exclusions">
+       <enabledWhen>
+          <adapt type="org.sonarlint.eclipse.core.resource.ISonarLintProject">
+            <test property="org.sonarlint.eclipse.core.open"/>
+          </adapt>
+       </enabledWhen>
+    </page>
+  </extension>
+
+  <extension point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="menu:org.sonarlint.eclipse.ui.views.issues.IssuesView">
+         <menu
+           id="org.eclipse.ui.ide.problems.filtersMenu"
+           label="Show"
+           mnemonic="S">
+         </menu>
+         <menu
+           id="problemsGroupByMenu"
+           label="Group By"
+           mnemonic="G">
+         </menu>
+         <menu
+               id="org.eclipse.ui.ide.problems.markerSortMenu"
+               label="Sort By"
+               mnemonic="S">
+         </menu>
+         <command
+               commandId="org.eclipse.ui.ide.configureFilters"
+               mnemonic="%command.configureFilters.mnemonic"
+               style="push">
+         </command>
+         <command
+               commandId="org.eclipse.ui.ide.configureColumns"
+               mnemonic="%command.configureColumns.mnemonic"
+               style="push">
+         </command>
+      </menuContribution>
+      <menuContribution
+            locationURI="popup:org.sonarlint.eclipse.ui.views.issues.IssuesView">
+           <command
+                 commandId="org.sonarlint.eclipse.ui.internal.command.ShowRuleDescriptionCommand"
+                 icon="icons/full/marker_resolution16/showrule.png"
+                 style="push"
+                 mnemonic="R">
+         </command>
+      </menuContribution>
+      <menuContribution
+            locationURI="popup:org.sonarlint.eclipse.ui.views.issues.IssuesView">
+           <command
+                 commandId="org.sonarlint.eclipse.ui.internal.command.ShowIssueLocationsCommand"
+                 icon="icons/full/marker_resolution16/showlocations.png"
+                 style="push"
+                 mnemonic="I">
+         </command>
+      </menuContribution>
+      <menuContribution
+            locationURI="popup:org.sonarlint.eclipse.ui.views.issues.IssuesView">
+           <command
+                 commandId="org.sonarlint.eclipse.ui.internal.command.DeactivateRuleCommand"
+                 icon="icons/full/marker_resolution16/disablerule.png"
+                 style="push"
+                 mnemonic="u">
+          <visibleWhen>
+             <with variable="activeMenuSelection">
+                <iterate ifEmpty="false">
+                    <adapt type="org.eclipse.core.resources.IMarker">
+                        <test property="org.sonarlint.eclipse.core.standalone"/>
+                    </adapt>
+                </iterate>
+             </with>
+          </visibleWhen>
+         </command>
+      </menuContribution>
+      <menuContribution
+            locationURI="menu:org.sonarlint.eclipse.ui.views.issues.ChangeSetIssuesView">
+         <menu
+           id="org.eclipse.ui.ide.problems.filtersMenu"
+           label="Show"
+           mnemonic="S">
+         </menu>
+     <menu
+           id="problemsGroupByMenu"
+           label="Group By"
+           mnemonic="G">
+         </menu>
+         <menu
+               id="org.eclipse.ui.ide.problems.markerSortMenu"
+               label="Sort By"
+               mnemonic="S">
+         </menu>
+         <command
+               commandId="org.eclipse.ui.ide.configureFilters"
+               mnemonic="%command.configureFilters.mnemonic"
+               style="push">
+         </command>
+         <command
+               commandId="org.eclipse.ui.ide.configureColumns"
+               mnemonic="%command.configureColumns.mnemonic"
+               style="push">
+         </command>
+      </menuContribution>
+      <menuContribution
+            locationURI="popup:org.sonarlint.eclipse.ui.views.issues.ChangeSetIssuesView">
+           <command
+                 commandId="org.sonarlint.eclipse.ui.internal.command.ShowRuleDescriptionCommand"
+                 icon="icons/full/marker_resolution16/showrule.png"
+                 style="push"
+                 mnemonic="R">
+         </command>
+      </menuContribution>
+      <menuContribution
+            locationURI="popup:org.sonarlint.eclipse.ui.views.issues.ChangeSetIssuesView">
+           <command
+                 commandId="org.sonarlint.eclipse.ui.internal.command.DeactivateRuleCommand"
+                 icon="icons/full/marker_resolution16/disablerule.png"
+                 style="push"
+                 mnemonic="u">
+         </command>
+      </menuContribution>
+	<menuContribution locationURI="popup:sonar.menu?after=group1">
+	   <command
+	         commandId="org.sonarlint.eclipse.ui.internal.command.AnalyzeChangeSetCommand"
+	         style="push">
+	      <visibleWhen>
+	         <with variable="activeMenuSelection">
+	            <iterate ifEmpty="false">
+	              <or>
+							    <adapt type="org.sonarlint.eclipse.core.resource.ISonarLintProject">
+				  					<test property="org.sonarlint.eclipse.core.open"/>
+					  				<test property="org.sonarlint.eclipse.core.supportsFullAnalysis"/>
+						  		</adapt>
+							    <adapt type="org.sonarlint.eclipse.core.resource.ISonarLintProjectContainer"/>
+				  			</or>
+	            </iterate>
+	         </with>
+	      </visibleWhen>
+	   </command>
+	   <command
+	         commandId="org.sonarlint.eclipse.ui.internal.command.AnalyzeCommand"
+	         style="push">
+	      <visibleWhen>
+	         <with variable="activeMenuSelection">
+	            <iterate ifEmpty="false">
+	            	<or>
+	            		<adapt type="org.sonarlint.eclipse.core.resource.ISonarLintProject">
+							      <test property="org.sonarlint.eclipse.core.open"/>
+  									<test property="org.sonarlint.eclipse.core.supportsFullAnalysis"/>
+						      </adapt>
+					        <adapt type="org.sonarlint.eclipse.core.resource.ISonarLintProjectContainer"/>
+					        <adapt type="org.sonarlint.eclipse.core.resource.ISonarLintFile"/>
+			    	    </or>
+	            </iterate>
+	         </with>
+	      </visibleWhen>
+	   </command>
+	   <command
+	         commandId="org.sonarlint.eclipse.ui.internal.command.ExcludeCommand"
+	         style="push">
+	     <visibleWhen>
+	       <with variable="activeMenuSelection">
+	         <iterate ifEmpty="false">
+	           <or>
+			         <adapt type="org.sonarlint.eclipse.core.resource.ISonarLintFile"/>
+			       </or>
+	         </iterate>
+	        </with>
+	     </visibleWhen>
+	     
+	   </command>
+	   <command
+             commandId="org.sonarlint.eclipse.ui.internal.command.BindProjectsCommand"
+             style="push">
+          <visibleWhen>
+              <with variable="activeMenuSelection">
+                 <iterate ifEmpty="false">
+               	   <adapt	type="org.sonarlint.eclipse.core.resource.ISonarLintProject">
+											<test property="org.sonarlint.eclipse.core.open"/>
+											<test	property="org.sonarlint.eclipse.core.bound" value="false"/>
+									 </adapt>
+                 </iterate>
+             </with>
+          </visibleWhen>
+       </command>
+      <command
+             commandId="org.sonarlint.eclipse.ui.internal.command.ChangeProjectsBindingCommand"
+             style="push">
+          <visibleWhen>
+              <with variable="activeMenuSelection">
+                 <iterate ifEmpty="false" operator="or">
+                   <or>
+	                   <adapt	type="org.sonarlint.eclipse.core.resource.ISonarLintProject">
+	  									  <test property="org.sonarlint.eclipse.core.open"/>
+												<test	property="org.sonarlint.eclipse.core.bound"/>
+										 </adapt>
+										 <adapt type="org.sonarlint.eclipse.core.resource.ISonarLintProjectContainer"/>
+									 </or>
+                 </iterate>
+             </with>
+          </visibleWhen>
+       </command>
+       <command
+             commandId="org.sonarlint.eclipse.ui.internal.command.UnbindProjectsCommand"
+             style="push">
+          <visibleWhen>
+              <with variable="activeMenuSelection">
+                 <iterate ifEmpty="false" operator="or">
+                 	  <adapt type="org.sonarlint.eclipse.core.resource.ISonarLintProject">
+											<test property="org.sonarlint.eclipse.core.open"/>
+											<test	property="org.sonarlint.eclipse.core.bound"/>
+									 </adapt>
+                 </iterate>
+             </with>
+          </visibleWhen>
+       </command>
+	</menuContribution>
+  </extension>
+
+  <extension point="org.eclipse.ui.commands">
+    <category
+          description="SonarLint commands"
+          id="org.sonarlint.eclipse.ui.command.category"
+          name="SonarLint">
+    </category>
+    <command
+          description="Show rule details"
+          id="org.sonarlint.eclipse.ui.internal.command.ShowRuleDescriptionCommand"
+          name="Rule description"
+          categoryId="org.sonarlint.eclipse.ui.command.category">
+    </command>
+    <command
+          description="Show issue locations"
+          id="org.sonarlint.eclipse.ui.internal.command.ShowIssueLocationsCommand"
+          name="Issue locations"
+          categoryId="org.sonarlint.eclipse.ui.command.category">
+    </command>
+    <command
+          description="Deactivate the rule of this issue"
+          id="org.sonarlint.eclipse.ui.internal.command.DeactivateRuleCommand"
+          name="Deactivate rule"
+          categoryId="org.sonarlint.eclipse.ui.command.category">
+    </command>
+    <command
+          description="Analyze with SonarLint"
+          id="org.sonarlint.eclipse.ui.internal.command.AnalyzeCommand"
+          name="Analyze"
+          categoryId="org.sonarlint.eclipse.ui.command.category">
+    </command>
+    <command
+          description="Exclude from analysis"
+          id="org.sonarlint.eclipse.ui.internal.command.ExcludeCommand"
+          name="Exclude"
+          categoryId="org.sonarlint.eclipse.ui.command.category">
+    </command>
+    <command
+          description="Analyze changed files with SonarLint"
+          id="org.sonarlint.eclipse.ui.internal.command.AnalyzeChangeSetCommand"
+          name="Analyze changed files"
+          categoryId="org.sonarlint.eclipse.ui.command.category">
+    </command>
+    <command
+          description="Bind to a project analyzed on SonarQube or SonarCloud"
+          id="org.sonarlint.eclipse.ui.internal.command.BindProjectsCommand"
+          name="Bind to SonarQube or SonarCloud..."
+          categoryId="org.sonarlint.eclipse.ui.command.category">
+    </command>
+    <command
+          description="Bind to a project analyzed on SonarQube or SonarCloud"
+          id="org.sonarlint.eclipse.ui.internal.command.ChangeProjectsBindingCommand"
+          name="Change binding..."
+          categoryId="org.sonarlint.eclipse.ui.command.category">
+    </command>
+    <command
+          description="Unbind selected projects"
+          id="org.sonarlint.eclipse.ui.internal.command.UnbindProjectsCommand"
+          name="Unbind project"
+          categoryId="org.sonarlint.eclipse.ui.command.category">
+    </command>
+  </extension>
+
+  <extension point="org.eclipse.ui.handlers">
+    <handler
+          class="org.sonarlint.eclipse.ui.internal.command.ShowRuleDescriptionCommand"
+          commandId="org.sonarlint.eclipse.ui.internal.command.ShowRuleDescriptionCommand">
+    </handler>
+    <handler
+          class="org.sonarlint.eclipse.ui.internal.command.ShowIssueLocationsCommand"
+          commandId="org.sonarlint.eclipse.ui.internal.command.ShowIssueLocationsCommand">
+    </handler>
+    <handler
+          class="org.sonarlint.eclipse.ui.internal.command.DeactivateRuleCommand"
+          commandId="org.sonarlint.eclipse.ui.internal.command.DeactivateRuleCommand">
+    </handler>
+    <handler
+          class="org.sonarlint.eclipse.ui.internal.command.AnalyzeCommand"
+          commandId="org.sonarlint.eclipse.ui.internal.command.AnalyzeCommand">
+          <enabledWhen>
+		        <with variable="activeMenuSelection">
+		          <iterate ifEmpty="false" operator="or">
+		            <or>
+	                 <adapt type="org.sonarlint.eclipse.core.resource.ISonarLintFile">
+		                 <not>
+		                   <test property="org.sonarlint.eclipse.core.excluded"/>
+		                 </not>
+	                 </adapt>
+	                 <not>
+	                 		<adapt type="org.sonarlint.eclipse.core.resource.ISonarLintFile"/>
+	                 </not>
+                 </or>
+	         </iterate>
+		       </with>
+         </enabledWhen>
+    </handler>
+    <handler
+          class="org.sonarlint.eclipse.ui.internal.command.ExcludeCommand"
+          commandId="org.sonarlint.eclipse.ui.internal.command.ExcludeCommand">
+          <enabledWhen>
+		        <with variable="activeMenuSelection">
+		          <iterate ifEmpty="false" operator="or">
+                 <adapt type="org.sonarlint.eclipse.core.resource.ISonarLintFile">
+	                 <not>
+	                   <test property="org.sonarlint.eclipse.core.excluded"/>
+	                 </not>
+                 </adapt>
+		         </iterate>
+		       </with>
+         </enabledWhen>
+    </handler>
+    <handler
+          class="org.sonarlint.eclipse.ui.internal.command.BindProjectsCommand"
+          commandId="org.sonarlint.eclipse.ui.internal.command.BindProjectsCommand">
+    </handler>
+    <handler
+          class="org.sonarlint.eclipse.ui.internal.command.BindProjectsCommand"
+          commandId="org.sonarlint.eclipse.ui.internal.command.ChangeProjectsBindingCommand">
+    </handler>
+    <handler
+          class="org.sonarlint.eclipse.ui.internal.command.UnbindProjectsCommand"
+          commandId="org.sonarlint.eclipse.ui.internal.command.UnbindProjectsCommand">
+    </handler>
+    <handler
+          class="org.sonarlint.eclipse.ui.internal.command.AnalyzeChangeSetCommand"
+          commandId="org.sonarlint.eclipse.ui.internal.command.AnalyzeChangeSetCommand">
+    </handler>
+  </extension>
+
+  <extension point="org.eclipse.ui.commandImages">
+    <image
+      commandId="org.sonarlint.eclipse.ui.internal.command.AnalyzeCommand"
+      icon="icons/sonarlint-run-16x16.png" />
+    <image
+      commandId="org.sonarlint.eclipse.ui.internal.command.AnalyzeChangeSetCommand"
+      icon="icons/sonarlint-run-changed-16x16.png" />
+    <image
+      commandId="org.sonarlint.eclipse.ui.internal.command.BindProjectsCommand"
+      icon="icons/synced.gif" />
+    <image
+      commandId="org.sonarlint.eclipse.ui.internal.command.ChangeProjectsBindingCommand"
+      icon="icons/synced.gif" />
+    <image
+      commandId="org.sonarlint.eclipse.ui.internal.command.UnbindProjectsCommand"
+      icon="icons/full/menu16/disconnect_co.png" />
+  </extension>
+
+   <extension
+        point="org.eclipse.ui.editors.annotationTypes">
+        <type
+            name="org.sonarlint.eclipse.onTheFlyIssueAnnotationType"
+            markerType="org.sonarlint.eclipse.core.sonarlintOnTheFlyProblem"/>
+        <type
+            name="org.sonarlint.eclipse.issueFlowAnnotationType"/>
+    </extension>
+    
+    <extension
+        point="org.eclipse.ui.editors.annotationTypes">
+        <type
+            name="org.sonarlint.eclipse.reportIssueAnnotationType"
+            markerType="org.sonarlint.eclipse.core.sonarlintReportProblem"/>
+    </extension>
+
+    <extension
+        point="org.eclipse.ui.editors.markerAnnotationSpecification">
+        <specification
+              annotationImageProvider="org.sonarlint.eclipse.ui.internal.markers.SonarLintMarkerImageProvider"
+              annotationType="org.sonarlint.eclipse.onTheFlyIssueAnnotationType"
+              colorPreferenceKey="org.sonarlint.eclipse.ui.issue.color"
+              colorPreferenceValue="30,144,255"
+              highlightPreferenceKey="org.sonarlint.eclipse.ui.issue.highlight"
+              highlightPreferenceValue="false"
+              icon="icons/sonarlint-16x16.png"
+              isGoToNextNavigationTarget="true"
+              isGoToNextNavigationTargetKey="org.sonarlint.eclipse.issue.next"
+              isGoToPreviousNavigationTarget="true"
+              isGoToPreviousNavigationTargetKey="org.sonarlint.eclipse.issue.previous"
+              label="%sonar.marker.specification.label"
+              overviewRulerPreferenceKey="org.sonarlint.eclipse.ui.issue.overviewruler"
+              overviewRulerPreferenceValue="true"
+              presentationLayer="3"
+              showInNextPrevDropdownToolbarAction="true"
+              showInNextPrevDropdownToolbarActionKey="org.sonarlint.eclipse.issue.dropdown"
+              textPreferenceKey="org.sonarlint.eclipse.ui.issue.error.text"
+              textPreferenceValue="true"
+              textStylePreferenceKey="org.sonarlint.eclipse.ui.issue.text.style"
+              textStylePreferenceValue="SQUIGGLES"
+              verticalRulerPreferenceKey="org.sonarlint.eclipse.ui.issue.verticalruler"
+              verticalRulerPreferenceValue="false"/>
+        <specification
+              annotationType="org.sonarlint.eclipse.issueFlowAnnotationType"
+              label="SonarLint issue location"
+              annotationImageProvider="org.sonarlint.eclipse.ui.internal.markers.SonarLintMarkerImageProvider"
+              colorPreferenceKey="org.sonarlint.eclipse.ui.issueFlow.color"
+              colorPreferenceValue="242,222,222"
+              highlightPreferenceKey="org.sonarlint.eclipse.ui.issueFlow.highlight"
+              highlightPreferenceValue="true"
+              icon="icons/sonarlint-16x16.png"
+              isGoToNextNavigationTarget="true"
+              isGoToNextNavigationTargetKey="org.sonarlint.eclipse.issueFlow.next"
+              isGoToPreviousNavigationTarget="true"
+              isGoToPreviousNavigationTargetKey="org.sonarlint.eclipse.issueFlow.previous"
+              overviewRulerPreferenceKey="org.sonarlint.eclipse.ui.issueFlow.overviewruler"
+              overviewRulerPreferenceValue="true"
+              presentationLayer="4"
+              showInNextPrevDropdownToolbarAction="true"
+              showInNextPrevDropdownToolbarActionKey="org.sonarlint.eclipse.issueFlow.dropdown"
+              textPreferenceKey="org.sonarlint.eclipse.ui.issueFlow.error.text"
+              textPreferenceValue="true"
+              textStylePreferenceKey="org.sonarlint.eclipse.ui.issueFlow.text.style"
+              textStylePreferenceValue="NONE"
+              verticalRulerPreferenceKey="org.sonarlint.eclipse.ui.issueFlow.verticalruler"
+              verticalRulerPreferenceValue="false"/>
+  </extension>
+  
+  <!-- Marker resolver -->
+  <extension
+        point="org.eclipse.ui.ide.markerResolution">
+     <markerResolutionGenerator
+           class="org.sonarlint.eclipse.ui.internal.markers.SonarLintMarkerResolutionGenerator"
+           markerType="org.sonarlint.eclipse.core.sonarlintOnTheFlyProblem">
+     </markerResolutionGenerator>
+  </extension>
+
+  <extension
+        point="org.eclipse.ui.console.consoleFactories">
+     <consoleFactory
+           class="org.sonarlint.eclipse.ui.internal.console.SonarLintConsoleFactory"
+           icon="icons/sonarlint-16x16.png"
+           label="%consoleFactory.label">
+     </consoleFactory>
+  </extension>
+
+  <extension
+        point="org.eclipse.ui.console.consolePageParticipants">
+     <consolePageParticipant
+           class="org.sonarlint.eclipse.ui.internal.console.SonarLintConsolePageParticipant"
+           id="org.sonarlint.eclipse.ui.consolePageParticipant1">
+        <enablement>
+           <instanceof value="org.sonarlint.eclipse.ui.internal.console.SonarLintConsole" />
+        </enablement>
+     </consolePageParticipant>
+  </extension>
+  <extension
+        point="org.eclipse.ui.menus">
+     <menuContribution
+           locationURI="popup:org.eclipse.ui.popup.any?after=additions">
+        <menu
+              icon="icons/sonarlint-16x16.png"
+              id="sonar.menu"
+              label="%sonar.menu.label">
+           <separator
+                 name="group1">
+           </separator>
+           <visibleWhen checkEnabled="false">
+             <with variable="activePartId">
+               <not>
+	               <equals value="org.sonarlint.eclipse.ui.ServersView"/>
+	             </not>
+	           </with>
+           </visibleWhen>
+        </menu>
+     </menuContribution>
+  </extension>
+  
+  <extension point="org.eclipse.ui.decorators">  
+	  <decorator 
+	     id="org.sonarlint.eclipse.ui.sonarlintDecorator"
+       label="%sonarlint.decorator.name"
+	     state="true"  
+	     class="org.sonarlint.eclipse.ui.internal.SonarLintProjectDecorator"  
+	     lightweight="true"  
+	     location="TOP_RIGHT">
+	     <description>%sonarlint.decorator.description</description>
+	     <enablement>
+	       <objectClass name="org.eclipse.core.runtime.IAdaptable"/>
+	     </enablement>  
+	  </decorator>
+  </extension>
+  
+  <extension
+        point="org.eclipse.core.runtime.adapters">
+     <factory
+           adaptableType="org.eclipse.ui.IWorkingSet"
+           class="org.sonarlint.eclipse.ui.internal.adapter.DefaultSonarLintProjectContainerAdapterFactory">
+        <adapter
+              type="org.sonarlint.eclipse.core.resource.ISonarLintProjectContainer">
+        </adapter>
+     </factory>
+  </extension>
+  <extension
+        point="org.eclipse.core.runtime.preferences">
+     <initializer
+           class="org.sonarlint.eclipse.ui.internal.preferences.SonarLintPreferencesInitializer">
+     </initializer>
+  </extension>
+
+  <extension
+        point="org.eclipse.e4.ui.css.swt.theme">
+    <stylesheet
+          uri="css/sonarlint_dark.css">
+      <themeid
+            refid="org.eclipse.e4.ui.css.theme.e4_dark"></themeid>
+    </stylesheet>
+  </extension>
+
+</plugin>
